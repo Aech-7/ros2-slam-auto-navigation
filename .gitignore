@@ -1,0 +1,35 @@
+# ROS2 build, install, log directories
+build/
+install/
+log/
+
+# colcon metadata
+.colcon/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Mac / Windows system files
+.DS_Store
+Thumbs.db
+
+# Compiled binaries
+*.so
+*.out
+*.a
+*.o
+
+# URDF/mesh temporary files
+*.dae~
+*.stl~
+
+# Launch generated files
+*.launch.py~

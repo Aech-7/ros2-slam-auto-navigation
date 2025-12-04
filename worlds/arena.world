@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="arena">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="warehouse">
+       <pose>0 0 0  -1.5708 0 1.5708</pose>
+      <static>true</static>
+      <link name="base">
+        <visual name="visual">
+          <geometry>
+            <mesh><uri>file:///home/aech/ros2_ws/src/warehouse_bot/worlds/meshes/eternal_arena.dae</uri></mesh>
+          </geometry>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>file:///home/aech/ros2_ws/src/warehouse_bot/worlds/meshes/eternal_arena.dae</uri>
+            </mesh>
+          </geometry>
+        </collision>
+      </link>
+      
+    </model>
+    <!-- <include>
+      <uri>model://my_robot</uri>
+      <name>my_robot</name>
+      <pose>0 0.7 0.2 0 0 0</pose>
+    </include> -->
+  </world>
+</sdf>
