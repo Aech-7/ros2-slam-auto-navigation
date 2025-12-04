@@ -10,6 +10,19 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
 def generate_launch_description():
+
+    # Declare position arguments
+    declare_x_cmd = DeclareLaunchArgument("x", default_value="2.7")
+    declare_y_cmd = DeclareLaunchArgument("y", default_value="1.2")
+    declare_z_cmd = DeclareLaunchArgument("z", default_value="0.1")
+    declare_Y_cmd = DeclareLaunchArgument("Y", default_value="-1.5708")   # yaw
+
+    # LaunchConfigurations for each
+    x = LaunchConfiguration("x")
+    y = LaunchConfiguration("y")
+    z = LaunchConfiguration("z")
+    Y = LaunchConfiguration("Y")
+
     # Define the package name for easier reference
     package_name = 'ros2_slam_auto_navigation'
 
@@ -65,11 +78,18 @@ def generate_launch_description():
     # Node to spawn the robot entity in Gazebo
     # The 'robot_description' topic contains the robot's URDF model
     spawn_entity = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        arguments=['-topic', 'robot_description', '-entity', 'my_bot'],
-        output='screen'
-    )
+    package='gazebo_ros',
+    executable='spawn_entity.py',
+    arguments=[
+        '-topic', 'robot_description',
+        '-entity', 'my_bot',
+        '-x', x,
+        '-y', y,
+        '-z', z,
+        '-Y', Y
+    ],
+    output='screen'
+)
 
     # Launch the diff_drive_controller for controlling the robot's differential drive system
     diff_drive_spawner = Node(
@@ -89,6 +109,10 @@ def generate_launch_description():
     # This ensures all components are launched together
     return LaunchDescription([
         declare_world_file_cmd,  # Declare the world file argument for customization
+        declare_x_cmd,
+        declare_y_cmd,
+        declare_z_cmd,
+        declare_Y_cmd,
         rsp,  # Robot State Publisher launch
         twist_mux,  # Twist Mux node for velocity command management
         gazebo,  # Gazebo simulator with world and parameters
