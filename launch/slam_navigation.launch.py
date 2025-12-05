@@ -6,6 +6,9 @@ from launch.substitutions import PathJoinSubstitution
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
 from launch_ros.substitutions import FindPackageShare
+import os
+from ament_index_python.packages import get_package_share_directory
+
 
 def generate_launch_description():
     # Declare arguments
@@ -59,7 +62,20 @@ def generate_launch_description():
         arguments=['-d', '/opt/ros/humble/share/nav2_bringup/rviz/nav2_default_view.rviz']
     )
 
+    ekf_node = Node(
+    package="robot_localization",
+    executable="ekf_node",
+    name="ekf_filter",
+    output="screen",
+    parameters=[os.path.join(
+        get_package_share_directory('ros2_slam_auto_navigation'),
+        'config',
+        'ekf.yaml'
+    )]
+)
+
     return LaunchDescription([
+        ekf_node,
         slam_params_file_arg,
         use_sim_time_arg,
         slam_toolbox_launch,
