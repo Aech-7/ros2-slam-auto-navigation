@@ -12,10 +12,10 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     # Declare position arguments
-    declare_x_cmd = DeclareLaunchArgument("x", default_value="2.7")
-    declare_y_cmd = DeclareLaunchArgument("y", default_value="1.2")
+    declare_x_cmd = DeclareLaunchArgument("x", default_value="2.3")
+    declare_y_cmd = DeclareLaunchArgument("y", default_value="-0.9")
     declare_z_cmd = DeclareLaunchArgument("z", default_value="0.1")
-    declare_Y_cmd = DeclareLaunchArgument("Y", default_value="-1.5708")   # yaw
+    declare_Y_cmd = DeclareLaunchArgument("Y", default_value="-3.141")   # yaw
 
     # LaunchConfigurations for each
     x = LaunchConfiguration("x")
