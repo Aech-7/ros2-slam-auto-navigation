@@ -39,18 +39,23 @@ def generate_launch_description():
     )
 
     # Include Nav2 Bringup launch
-    nav2_bringup_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('nav2_bringup'),
-                'launch',
-                'navigation_launch.py'
-            ])
-        ]),
-        launch_arguments={
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-        }.items()
-    )
+    # nav2_bringup_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([
+    #         PathJoinSubstitution([
+    #             FindPackageShare('nav2_bringup'),
+    #             'launch',
+    #             'navigation_launch.py'
+    #         ])
+    #     ]),
+    #     launch_arguments={
+    #         'use_sim_time': LaunchConfiguration('use_sim_time'),
+    #         'map': PathJoinSubstitution([
+    #         FindPackageShare('ros2_slam_auto_navigation'),
+    #         'maps',
+    #         'mymap.yaml'
+    #     ])
+    #     }.items()
+    # )
 
     # Launch RViz2
     rviz_node = Node(
@@ -79,6 +84,6 @@ def generate_launch_description():
         slam_params_file_arg,
         use_sim_time_arg,
         slam_toolbox_launch,
-        nav2_bringup_launch,
+        # nav2_bringup_launch,
         rviz_node
     ])

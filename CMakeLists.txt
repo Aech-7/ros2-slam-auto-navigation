@@ -43,5 +43,9 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS scripts/nav.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 ament_package()
 

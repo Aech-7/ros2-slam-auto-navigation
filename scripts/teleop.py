@@ -23,7 +23,7 @@ class TeleopKeyboard(Node):
         super().__init__('teleop_keyboard')
         self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.speed_linear = 0.5
-        self.speed_angular = 1.0
+        self.speed_angular = 2.0
 
     def get_key(self):
         tty.setraw(sys.stdin.fileno())
