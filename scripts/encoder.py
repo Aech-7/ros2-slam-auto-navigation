@@ -3,87 +3,76 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
-from tf2_ros import TransformBroadcaster
 import math
-import time
+import tf2_ros
 
 class EncoderOdom(Node):
     def __init__(self):
-        super().__init__('encoder_odom')
+        super().__init__('encoder_odometry')
 
-        # PARAMETERS
-        self.declare_parameter('wheel_radius', 0.033)  # meters
-        self.declare_parameter('wheel_separation', 0.18)
-        self.declare_parameter('ticks_per_rev', 360)
+        self.declare_parameter('wheel_separation', 0.30)
+        self.declare_parameter('wheel_radius', 0.05)
 
-        self.wheel_radius = self.get_parameter('wheel_radius').value
-        self.wheel_sep = self.get_parameter('wheel_separation').value
-        self.ticks_per_rev = self.get_parameter('ticks_per_rev').value
+        self.L = self.get_parameter('wheel_separation').value
+        self.R = self.get_parameter('wheel_radius').value
 
-        # Encoder counts received externally
-        self.sub_enc_left = self.create_subscription(
-            Odometry, '/encoder_left', self.cb_left, 10)
-        self.sub_enc_right = self.create_subscription(
-            Odometry, '/encoder_right', self.cb_right, 10)
-
-        self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
-        self.tf_broadcaster = TransformBroadcaster(self)
-
-        # State
-        self.last_time = self.get_clock().now()
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
-        self.left_last = 0
-        self.right_last = 0
+        
+        self.last_time = self.get_clock().now()
 
-    def cb_left(self, msg):
-        self.left_last = msg.pose.pose.position.x  # expecting encoder count here
+        # encoder topic example: custom interface giving left & right distance
+        self.sub = self.create_subscription(
+            Odometry, '/wheel/encoder', self.encoder_callback, 10)
 
-    def cb_right(self, msg):
-        self.right_last = msg.pose.pose.position.x  # expecting encoder count here
-        self.update_odom()
+        self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
 
-    def update_odom(self):
-        now = self.get_clock().now()
-        dt = (now - self.last_time).nanoseconds / 1e9
-        self.last_time = now
+        self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
 
-        # Convert ticks to distance
-        left_dist = (2 * math.pi * self.wheel_radius) * (self.left_last / self.ticks_per_rev)
-        right_dist = (2 * math.pi * self.wheel_radius) * (self.right_last / self.ticks_per_rev)
+    def encoder_callback(self, msg):
 
-        d = (right_dist + left_dist) / 2
-        th = (right_dist - left_dist) / self.wheel_sep
+        # distance traveled by wheels in this time step
+        dl = msg.twist.twist.linear.x       # left  wheel distance (m)
+        dr = msg.twist.twist.linear.y       # right wheel distance (m)
 
-        # Update pose
-        self.x += d * math.cos(self.th + th/2)
-        self.y += d * math.sin(self.th + th/2)
-        self.th += th
+        dt = (self.get_clock().now() - self.last_time).nanoseconds * 1e-9
+        self.last_time = self.get_clock().now()
 
-        # Publish odom msg
+        # velocities
+        v = (dr + dl) / 2.0
+        w = (dr - dl) / self.L
+
+        # integrate pose
+        self.x += v * math.cos(self.th) * dt
+        self.y += v * math.sin(self.th) * dt
+        self.th += w * dt
+
+        # publish odom message
         odom = Odometry()
-        odom.header.stamp = now.to_msg()
         odom.header.frame_id = "odom"
+        odom.child_frame_id  = "base_link"
+        odom.header.stamp = self.get_clock().now().to_msg()
 
         odom.pose.pose.position.x = self.x
         odom.pose.pose.position.y = self.y
         odom.pose.pose.orientation.z = math.sin(self.th/2)
         odom.pose.pose.orientation.w = math.cos(self.th/2)
 
-        odom.child_frame_id = "base_link"
+        odom.twist.twist.linear.x  = v
+        odom.twist.twist.angular.z = w
 
         self.odom_pub.publish(odom)
 
-        # Publish TF
+        # broadcast TF transform
         t = TransformStamped()
-        t.header.stamp = now.to_msg()
+        t.header.stamp = odom.header.stamp
         t.header.frame_id = "odom"
-        t.child_frame_id = "base_link"
+        t.child_frame_id  = "base_link"
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
-        t.transform.rotation.z = math.sin(self.th/2)
-        t.transform.rotation.w = math.cos(self.th/2)
+        t.transform.rotation.z = odom.pose.pose.orientation.z
+        t.transform.rotation.w = odom.pose.pose.orientation.w
 
         self.tf_broadcaster.sendTransform(t)
 

@@ -3,7 +3,7 @@ controller_manager:
     update_rate: 30
     use_sim_time: true
 
-    diff_cont:
+    diff_cont:  
       type: diff_drive_controller/DiffDriveController
 
     joint_broad:

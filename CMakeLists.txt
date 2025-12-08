@@ -32,6 +32,10 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+find_package(rclpy REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
+
 install(
   DIRECTORY config description launch worlds 
   DESTINATION share/${PROJECT_NAME}
@@ -39,18 +43,10 @@ install(
 
 
 install(
-  PROGRAMS scripts/teleop.py
+  PROGRAMS scripts
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(
-  PROGRAMS scripts/nav.py
-  DESTINATION lib/${PROJECT_NAME}
-)
 
-install(
-  PROGRAMS scripts/goal.py
-  DESTINATION lib/${PROJECT_NAME}
-)
 ament_package()
 

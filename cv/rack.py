@@ -6,7 +6,7 @@ import yaml
 # Load map metadata (YAML)
 # -----------------------------
 
-yaml_path = "/home/aech/ros2_ws/src/ros2-slam-auto-navigation/maps/mymap.yaml"
+yaml_path = "/home/aech/ros2_ws/src/ros2-slam-auto-navigation/maps/mymap3.yaml"
 
 with open(yaml_path, 'r') as f:
     metadata = yaml.safe_load(f)
@@ -21,7 +21,7 @@ print("Map Origin:", origin_x, origin_y)
 # Adjustable parameters
 # -----------------------------
 
-min_width_m = 0.10    # minimum 10 cm
+min_width_m = 0.40    # minimum 10 cm
 max_width_m = 0.90    # maximum 90 cm
 
 min_w_px = int(min_width_m / resolution)
@@ -33,7 +33,7 @@ print("Accepted rack thickness (pixels):", min_w_px, "to", max_w_px)
 # Load map image
 # -----------------------------
 
-pgm_path = "/home/aech/ros2_ws/src/ros2-slam-auto-navigation/maps/mymap.pgm"
+pgm_path = "/home/aech/ros2_ws/src/ros2-slam-auto-navigation/maps/mymap3.pgm"
 img = cv2.imread(pgm_path, cv2.IMREAD_GRAYSCALE)
 height, width = img.shape
 
